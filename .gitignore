@@ -1,0 +1,10 @@
+*.zip
+**/**/tmp/*
+**/**/auto/*
+**/**/waf-*/*
+**/**/.lock-*
+**/**/.wafpickle*
+**/**/*.log
+.lock-*
+**/**/c4che/*
+**/auto/*

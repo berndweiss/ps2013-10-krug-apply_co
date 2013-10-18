@@ -1,0 +1,44 @@
+top = '.'
+out = 'tmp'
+
+def configure(conf):
+    conf.load('tex')
+    conf.load('biber')
+    if not conf.env.PDFLATEX:
+        conf.fatal('Could not find pdflatex')
+
+		
+def options(opt):
+    opt.load('tex')
+
+	
+def build(bld):
+
+    #'R -e "library(knitr); print(getwd()); knit(\'ps2013intro-meta-analyse.Rnw\')"'
+    def run_knitr(task):
+	    ## .replace('\\', '/') as suggested by T Nagy in ...
+        src = task.inputs[0].abspath().replace('\\', '/') 
+        cmd = 'R -e "library(knitr); print(getwd()); knit(\'%s\')"' % (src)
+        return task.exec_command(cmd) 
+
+    bld(rule = run_knitr,
+        source = 'ps2013-10-krug-apply_co.Rnw',	
+        target = 'ps2013-10-krug-apply_co.tex',
+        prompt = 1
+    )
+		
+    bld(features = 'tex',
+        type = 'pdflatex', # pdflatex or xelatex
+        source = 'ps2013-10-krug-apply_co.tex', # mandatory, the source
+        outs = 'pdf', # 'pdf' or 'ps pdf'
+		prompt = 1, # 0 for the batch mode
+		)
+	
+    bld.add_post_fun(post)  # copy PDF, possibly view also	
+	
+	
+def post(ctx):
+    ## Copy PDF file to /slide
+    ctx.exec_command("cp tmp/ps2013-10-krug-apply_co.pdf ../../slide")
+    ## Copy tangled R file to /src/R
+    ctx.exec_command("cp tmp/ps2013-10-krug-apply_co.R ../R")

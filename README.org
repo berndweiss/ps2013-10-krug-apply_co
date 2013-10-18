@@ -1,0 +1,10 @@
+*** "Divide et impera: Split-apply-combine-Ansätze in R" -- Vortrag in der Köln R User Group (KRUG) am 17.10.2013
+
+Die PDF-Folien finden sich in =/slide=.
+
+Mein =make= heißt =waf= <http://code.google.com/p/waf/>. Um den build-Prozess zu starten, =run_waf.py= aufrufen (setzt Python voraus). 
+
+Die Datei =config= muss nicht verändert werden. 
+
+Website der KRUG: http://www.meetup.com/KoelnRUG/
+

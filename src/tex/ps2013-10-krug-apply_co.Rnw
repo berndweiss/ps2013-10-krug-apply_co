@@ -1,0 +1,762 @@
+%% http://user.uni-frankfurt.de/~muehlich/tex/wordvslatex.html
+% Local variables:
+% TeX-open-quote: "\"`"
+% TeX-close-quote: "\"'"
+% End:
+
+%% Um in Bibliographie dt. Titel von \MakeSentenceCase zu schuetzen, doppelte {{}} verwenden.
+
+\documentclass[%
+handout, %
+]{beamer}
+
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[babel]{csquotes}
+
+\usepackage{helvet}
+
+\usetheme{default}
+\setbeamercovered{transparent}
+%% Abbildungen und Tabellen numerieren
+\setbeamertemplate{caption}[numbered]
+%\usecolortheme{beaver}
+
+%%\usecolortheme{rose}%seagull} 
+\usecolortheme{dolphin}
+%\useoutertheme{infolines}
+%\useinnertheme{circles}
+%\setbeamertemplate{itemize item}[circle]
+\setbeamertemplate{itemize items}[square]
+
+\usepackage{color}
+\usepackage{enumerate}
+
+\usepackage{graphicx}
+\graphicspath{{fig/}}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\usepackage{hyperref}
+\definecolor{links}{HTML}{2A1B81}
+\hypersetup{colorlinks, linkcolor = links, urlcolor=links}
+
+\usepackage{amsmath}
+
+\usepackage{listings}
+% \lstset{language =[LaTeX]TeX, numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=5pt,%%
+% keywordstyle=\color{red}\bfseries,showstringspaces=true}
+%% \lstset{}
+
+\usepackage{tikz}
+\usetikzlibrary{calc, arrows,shapes,positioning,shadows,trees, decorations.text,mindmap,automata}
+\newcommand{\tx}[1]{node[beschrif, near end, fill = white] (TextNode){$#1$}}
+
+\newcommand\tikzmark[1]{%
+  \tikz[overlay,remember picture] \coordinate (#1);}
+
+\usepackage[style=apa, backend=biber, bibstyle=authoryear, bibencoding=utf8, natbib = true]{biblatex}
+
+\DeclareLanguageMapping{ngerman}{ngerman-apa}
+\DeclareCaseLangs*{ngerman}
+\addbibresource{ps2013-10-krug-apply_co.bib}
+%% http://www.mrunix.de/forums/showthread.php?t=67386
+% \DefineBibliographyStrings{ngerman}{andothers={et\addabbrvspace al\adddot}}
+
+\usepackage{cclicenses}
+
+\setlength{\itemsep}{2\baselineskip}
+
+
+
+\AtBeginSection[] % Do nothing for \section*
+{
+  \begin{frame}%<beamer>
+    \frametitle{Gliederung}
+    \begin{footnotesize}
+      \tableofcontents[sectionstyle=show/shaded, subsectionstyle =
+      show/show/shaded, subsubsectionstyle=show/hide/hide]
+    \end{footnotesize}
+  \end{frame}
+}
+
+
+\AtBeginSubsection[] % Do nothing for \section*
+{
+  \begin{frame}[plain]%<beamer>
+    \frametitle{Abschnittsübersicht}
+    \begin{footnotesize}
+      %% \tableofcontents[sectionstyle=show/hide, subsectionstyle = show/show/hide]
+      \tableofcontents[sectionstyle=show/shaded, subsectionstyle = show/shaded/hide]
+    \end{footnotesize}
+  \end{frame}
+}
+
+\definecolor{lightblue}{rgb}{0.8,0.85,1}
+\definecolor{lightblue}{rgb}{0.8,0.85,1}
+\newcommand{\package}[1]{\textcolor{green}{\texttt{#1}}}
+\newcommand{\argmt}[1]{\textcolor{lightblue}{\texttt{#1}}}
+\newcommand{\cmnd}[1]{\colorbox{lightblue}{\lstinline|#1|}}
+
+
+\lstdefinestyle{inline}{basicstyle=\ttfamily, fontadjust=true}
+\newcommand{\code}[1]{\colorbox{lightblue}{\lstinline[style=inline]|#1|}}
+
+
+<<echo=FALSE, results='hide'>>=
+opts_chunk$set(comment=NA, background="#ccd9ff", out.width='\\linewidth', tidy=FALSE, size = "footnotesize")
+options(width=60)
+@
+
+\definecolor{dkgreen}{rgb}{0,0.5,0}
+\definecolor{dkred}{rgb}{0.5,0,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+
+\definecolor{dkgreen}{rgb}{0,0.5,0}
+\definecolor{dkred}{rgb}{0.5,0,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+
+\lstset{basicstyle=\ttfamily\bfseries\footnotesize,
+  morekeywords={virtualinvoke},
+  %% keywordstyle=\color{blue},
+  %% ndkeywordstyle=\color{red},
+  commentstyle=\color{dkred},
+  %% stringstyle=\color{dkgreen},
+  numbers=left,
+  numberstyle=\ttfamily\tiny\color{gray},
+  stepnumber=1,
+  numbersep=10pt,
+  backgroundcolor=\color{white},
+  tabsize=4,
+  showspaces=false,
+  showstringspaces=false,
+  xleftmargin=.23in
+}
+
+
+
+\setbeamerfont*{frametitle}{series = \bfseries, size = \Large}
+\setbeamerfont*{title}{series = \bfseries, size = \Large}
+
+
+\title[]{\large{Divide et impera: \\ \texttt{Split-apply-combine}-Ansätze in \textsf{R}}} 
+
+\date{7. Treffen der Köln R User Group\\ am 18. Oktober 2013\\} 
+
+\author{Bernd Weiß \\ \url{http://berndweiss.net}}
+
+
+\begin{document}
+
+
+\begin{frame}[plain]
+\titlepage
+\begin{flushright}
+  \byncsa
+\end{flushright}
+\end{frame}
+
+
+\begin{frame}\frametitle{Gliederung}
+  \tableofcontents
+\end{frame}
+
+
+\section{Problem}
+
+\begin{frame}
+  \frametitle{Beispielprobleme}
+  %%
+  \begin{itemize}
+  \item Berechnen des mittleren Einkommens nach dem Gruppierungsmerkmal
+    höchster Schulabschluss.
+  \item Schätzen eines linearen Regressionsmodells für verschiedene
+    Altersgruppen.
+  \item Erstellen einer Tabelle mit (beliebigen) deskriptiven Statistiken für
+    einen Datensatz (gesamt oder wieder für verschiedene Gruppen).
+  \item Simulation von 1000 Datensätzen, schätze für jeden Datensatz ein
+    lineares Regressionsmodell, extrahiere die Regressionskoeffizienten und
+    untersuche die Verteilung der Koeffizienten.
+  \item In einem Verzeichnis befinden sich 2000 csv-Dateien. Diese sollen eingelesen werden,
+    berechne pro Datei einen Mittelwert und speichere den neuen Datensatz mit 2000 Mittelwerten ab.
+  \item \ldots
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Was heißt \enquote{split-apply-combine}?}
+  %%
+  \begin{itemize}
+  \item \enquote{split}: Teile ein großes Problem in kleinere Teile (manchmal liegen die Einzelteile aber auch schon vor).
+  \item \enquote{apply}: Wende eine beliebige Funktion auf jedes Teil an.
+  \item \enquote{combine}: Fasse die Ergebnisse der einzelnen Funktionen wieder zusammen.
+  \end{itemize} 
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Das  \enquote{split-apply-combine}-Prinzip}
+  \includegraphics[scale = 0.35]{fig/f_split-apply-combine}
+  \newline
+  \citep[Quelle: ][]{shalizi_split_2013}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Das Problem und die Lösung in R: \enquote{vectorization}}
+  \begin{itemize}
+  \item \enquote{split-apply-combine}-Probleme werden in anderen Sprachen überlicherweise mit Schleifen gelöst.
+  \item Schleifen in R vermeiden, stattdessen
+    \enquote{vectorization}\footnote{\enquote{Vectorization: Where functions are
+        applied element-wise to vectors.} \citep[25]{matloff_art_2011}}
+    (entsprechende Funktionen sind in C implementiert und damit häufig schneller
+    als purer R-Code). \citet[][147]{teetor_r_2011} schreibt dazu:
+    \begin{quotation}
+      \enquote{Where traditional programming languages use loops, R uses
+        vectorized operations and the apply functions to crunch data in batches,
+        greatly streamlining the calculations.}
+    \end{quotation}
+  \item \enquote{Vectorized} R-Code ist (häufig) lesbarer.
+  \item \enquote{Vectorized functions} können parallelisiert werden.
+  \end{itemize}
+\end{frame}
+
+
+
+\section{Übersicht von Paketen und Befehlen}
+
+
+\begin{frame}
+  \frametitle{Gliederung der Pakete und Befehle}
+  %% 
+  Alle nachfolgend aufgeführten Pakete und Befehle können nach folgenden
+  Dimensionen/Aspekten gegliedert werden:
+  \begin{itemize}
+  \item Statistische Aggregation ($Dim_{input} > Dim_{output}$) vs
+    Datentaufbereitung/-transformation ($Dim_{input} = Dim_{output}$)
+  \item Ausgangsdatentyp (z.B. \code{data.frame}) vs Zieldatentyp (z.B. \code{vector})
+  \item (Vektorisierte) Alternative zu Schleifen vs Aggregation/Transformation
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Eine (unvollständige) Übersicht von Paketen und Befehlen}
+  %% 
+  \begin{small}
+    \begin{itemize}
+    \item \code{base}-Paket:
+      \begin{itemize}
+      \item \code{apply}, \code{lapply} (\code{sapply}), \code{tapply},
+        \code{mapply}, \ldots
+      \item \code{by}, \code{aggregate}
+      \item \code{replicate}
+      \item \ldots
+      \end{itemize}
+    \item \code{plyr}-Paket (u.a. konsistentes Namensschema für Ein- und
+      Ausgabedatentyp, parallele Verarbeitung)
+    \item \code{doBy}-Paket (orientiert sich an SAS-Funktion, stat. Aggregation)
+    \item \code{data.table}-Paket (meistens schnellste\footnote[frame]{Für einen
+        Geschwindigkeitstest siehe
+        \href{http://www.r-statistics.com/2013/09/a-speed-test-comparison-of-plyr-data-table-and-dplyr/}{A
+          speed test comparison of plyr, data.table, and dplyr}, abgerufen am
+        2.10.2013} Lösung, aber eigenwillige Syntax)
+    \item \ldots
+    \end{itemize}
+    \citet[Für eine umfassendere Darstellung siehe
+    u.a.][]{wickham_split-apply-combine_2011}.
+  \end{small}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Base R Funktionen}
+  %% 
+  \begin{itemize}
+  \item Viele dieser \enquote{split-apply-combine}-Funktionen im
+    \code{base}-Paket unterscheiden sich lediglich nach dem Eingabe- und
+    Ausgabetyp.
+  \item Eine (unvollständige) Übersicht gibt die folgende Tabelle: 
+  \end{itemize}
+  
+  \begin{tiny}
+    \begin{tabularx}{\linewidth}{@{}>{\ttfamily}lll>{\raggedright\arraybackslash}X@{}}
+      \toprule
+      \multicolumn{1}{@{}l}{Function} & Input & Output & Anmerkung\\
+      \midrule
+      apply & array, matrix & array, list & Funktion bezieht sich auf Dimensionen 
+      (\enquote{margins}) eines \texttt{array}\\
+      \addlinespace
+      lapply     & list, data.frame & list & \\
+      \addlinespace
+      aggregate & ts, data.frame & ts, data.frame & Formelnotation möglich\\
+      \addlinespace
+      tapply & vector & array & column names werden gelöscht \\
+      \addlinespace
+      by & data.frame, matrix & list, array & wrapper für \texttt{tapply} \\
+      \bottomrule \multicolumn{4}{l@{}}{\tiny Quelle:
+        \url{http://stackoverflow.com/a/3506108/403473}; eigene Darstellung}
+    \end{tabularx}
+  \end{tiny}
+\end{frame}
+                                              
+
+
+\section{Statistische Funktionen (Aggregation)}
+
+\subsection{Base R}
+
+
+\begin{frame}[allowframebreaks, fragile]
+  \frametitle{apply()} 
+  
+  \begin{block}{Problem}
+    Eine Funktion (mean, sd, etc.) auf alle Spalten oder Zeilen eines Datensatzes anwenden. 
+  \end{block}
+  
+<<echo = FALSE>>=
+opts_chunk$set(tidy = FALSE, size = 'footnotesize')
+@   
+  
+<<>>=
+## Datensatz erstellen
+dat <- data.frame(v1 = sample(1:10, 5, 
+                              replace = TRUE),
+                  v2 = sample(0:1, 5, 
+                              replace = TRUE))
+## Einen missing value einbauen
+dat$v1[2] <- NA
+dat
+
+@   
+
+<<>>=
+## Fuer 2d-array: 
+## MARGIN = 1: rowwise, MARGIN = 2: columnwise 
+##
+## Spaltenmittelwerte
+apply(dat, MARGIN = 2, mean, na.rm = TRUE)
+
+## Zeilenmittelwerte
+apply(dat, MARGIN = 1, mean, na.rm = TRUE) 
+
+## Anzahl missing values
+apply(dat, 2, FUN = function(x)sum(is.na(x)))
+
+@ 
+
+  
+\end{frame}
+
+
+\begin{frame}[allowframebreaks, fragile]
+  \frametitle{aggregate()} 
+
+  \begin{block}{Problem}
+    Eine Funktion (mean, sd, etc.) auf Subgruppen eines Datensatzes anwenden und Aggregatstatistiken berechnen.
+  \end{block}
+
+  
+<<>>=
+## Datensatz erstellen
+dat <- data.frame(g1 = c(1, 1, 1, 2, 2, 2),
+                  g2 = c(1, 1, 2, 2, 3, 3),
+                  ## M_1 = 2, M_2 = 1
+                  x = c(1, 2, 3, 0.5, 1, 1.5))
+dat
+@   
+
+<<>>=
+## Gruppenmittelwerte berechnen
+aggregate(dat$x, by = list(dat$g1, dat$g2), mean)
+aggregate(. ~ g1 + g2, dat, mean)
+
+@ 
+
+\end{frame}
+
+
+
+\begin{frame}[allowframebreaks, fragile]
+  \frametitle{tapply()} 
+
+  \begin{block}{Problem}
+    \begin{small}
+      Eine Funktion (mean, sd, etc.) auf Subgruppen eines Datensatzes anwenden
+      und Aggregatstatistiken berechnen.
+    \end{small}
+  \end{block}
+  
+<<>>=
+## Datensatz erstellen
+dat <- data.frame(
+    g1 = factor(c("A", "A", "A", "B", "B", "B")),
+    g2 = c(1, 1, 2, 2, 3, 3),
+    ## M_1 = 2, M_2 = 1
+    x = c(1, 2, 3, 0.5, 1, 1.5))
+dat
+@   
+
+<<>>=
+## Gruppenmittelwerte berechnen 
+## (missings entsprechen fehlenden Gruppen)
+tapply(dat$x, INDEX = list(dat$g1, dat$g2), mean)
+
+@ 
+
+\end{frame}
+
+
+\subsection{Das \code{plyr}-Paket}
+
+\begin{frame}
+  \frametitle{Warum das \code{plyr}-Paket nutzen?}
+  
+  \begin{itemize}
+  \item Konsistentes Namensschema (\code{\{Input\}\{Output\}ply}, bspw. \code{ddply})
+  \item Teilweise schneller als \code{base}-Funktionen
+  \item Parallelisierung möglich
+  \item Speichereffizienter als \code{base}-Funktionen
+  \end{itemize}
+  \citep[siehe ausführlich][]{wickham_split-apply-combine_2011}.
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Hinweise zur Nutzung}
+  
+  \begin{itemize}
+  \item Der exakte Funktionsaufruf hängt vom Typ des Eingabeobjektes (Input) ab:
+    \begin{itemize}
+      \item \footnotesize \code{a*ply(.data, .margins, .fun, ...)}
+      \item \code{d*ply(.data, .variables, .fun, ...)}
+      \item \code{l*ply(.data, .fun, ..., ...)}
+      \end{itemize}
+    \item (Ist die Ausgabe ein data frame, sollte man angeben, ob man Daten aggregieren (via
+    \code{summarize}) oder transformieren (via \code{transform}) möchte.)
+  \end{itemize}
+  \citep[siehe ausführlich][]{wickham_split-apply-combine_2011}. 
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]
+  \frametitle{\code{plyr}: Deskriptive Statistiken}
+  %%
+  \begin{block}{Problem}
+    \begin{small}
+      Eine Tabelle mit (beliebigen) deskriptiven Statistiken nach Subgruppen
+      getrennt erstellen.
+    \end{small}
+  \end{block}
+  
+<<>>=
+library(plyr)
+dat <- data.frame(g = c(1, 1, 1, 1, 2, 2, 2, 2), 
+                  ## M_1 = 2, M_2 = 1
+                  x = c(1, 2, 3, NA, 0.5, 1, 1.5, NA))
+dat
+
+@ 
+
+<<tidy = FALSE>>=
+countMiss <- function(x){return(sum(is.na(x)))}
+ddply(dat, .(g), 
+      summarize, 
+      m = mean(x, na.rm=TRUE), ## Mittelwert
+      sd = sd(x, na.rm=TRUE),  ## Standardabweichung
+      n.miss = countMiss(x))   ## Anzahl missings
+@ 
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]
+  \frametitle{\code{plyr}: Korrelationen}
+  %%
+  \begin{block}{Problem}
+    \begin{small}
+      Nach Gruppen getrennte Korrelationsmatrizen berechnen.
+    \end{small}
+  \end{block}
+
+<<>>=
+library(plyr)
+set.seed(12)
+dat <- data.frame(g = factor(rbinom(100, 1, 0.5), 
+                             labels = c("males", "females")), 
+                  x = rnorm(100),
+                  y = rnorm(100),
+                  z = rnorm(100))
+head(dat)
+
+@ 
+  
+<<tidy = FALSE, size = "tiny" >>=
+
+## Funktion zur Berechnung der Korr.matrix
+## Die 1. Spalte mit der Gruppierungsvariablen ausschliessen
+calcCorr <- function(x){
+    cor(x[, -1])
+}
+## Eingabe: data.frame, Ausgabe: list
+dlply(dat, .(g), calcCorr)
+
+@   
+
+\end{frame}
+  
+
+\section{Datenaufbereitung}
+ 
+
+\begin{frame}[fragile, allowframebreaks]
+  \frametitle{Group-mean centering} 
+
+\begin{block}{Problem}
+    \begin{small}
+      In einem bestehenden Datensatz eine neue \enquote{group-mean centered}
+      Variable erstellen (etwa für Mehrebenenanalysen).
+    \end{small}
+  \end{block}
+  
+  
+<<>>=
+library(plyr)
+dat <- data.frame(g = c(1, 1, 1, 2, 2, 2), 
+                  ## M_1 = 2, M_2 = 1
+                  x = c(1, 2, 3, 0.5, 1, 1.5))
+dat
+
+@                                       %
+
+
+<<>>=
+
+ddply(dat, .(g), transform, 
+      x.c = scale(x, scale = FALSE))
+
+@ 
+\end{frame}
+
+
+\section{No loops, please!}
+
+
+\begin{frame}
+  \frametitle{Das Beispielproblem}
+  %%
+  \begin{itemize}
+  \item Erzeuge n Datensätze mit vorgegebenem Mittelwert und Standardabweichung
+    und speicher diese als Textdateien.
+  \item Lade die n Textdateien (und lege die Datensätze in einem Listenobjekt ab).
+  \item Berechne pro Datensatz verschiedene deskriptive Statistiken und
+    speichere diese in einem neuen \code{data.frame}.
+  \item Nachfolgend werden zwei Lösungsansätze vorgestellt, nämlich mit \code{lapply} und \code{plyr}.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}[allowframebreaks, fragile]
+  \frametitle{Schleifen vermeiden mit lapply}
+  
+<<cache = TRUE>>=
+## Anzahl Datensaetze
+n <- 100
+## data.frame-Objekt mit Parameterangaben und Dateinamen
+means <- sample(0:20, n, replace = TRUE)
+sd <- sample(1:10, n, replace = TRUE)
+param <- data.frame(m = means, sd)
+## Dateinamen
+param$filename <- paste0("../../data/n_files/dat", 
+                         1:n, ".dat")
+
+## Von data.frame zu list
+param <- split(param, 1:nrow(param))
+
+head(param, n = 2)
+
+@ 
+
+<<>>=
+
+## Funktion zum erzeugen der Datensaetze & speichern
+genData <- function(x){
+    mySample <- rnorm(n, x$m, x$sd)
+    write.table(mySample, file = x$filename, 
+                row.names = FALSE, col.names = FALSE)
+}
+
+@ 
+
+<<cache = TRUE>>=
+## Die "eigentliche Schleife"
+invisible(lapply(param, genData))
+## invisible() unterdrueckt die Ausgabe...
+
+@ 
+
+<<>>=
+## Jetzt die n Datenfiles wieder einlesen 
+readData <- function(x){
+    dat <- read.table(file = x$filename)
+    return(dat)
+}
+
+@ 
+
+<<>>=
+
+## Die "eigentliche Schleife" zum Einlesen
+lData <- lapply(param, readData)
+
+@ 
+
+Ein Auszug aus dem Verzeichnis \lstinline[style=inline]|/n_files| :
+
+<<>>=
+tmp <- list.files(path = "../../data/n_files")
+length(tmp)
+head(tmp, n = 10)
+@ 
+
+
+
+<<>>=
+## Einen data.frame mit deskr. Statistiken
+## erstellen
+
+calcDesc <- function(x){
+    m <- mean(x$V1)
+    sd <- sd(x$V1)
+    minimum <- min(x$V1)
+    maximum <- max(x$V1)
+    return(data.frame(m, sd, minimum, maximum))
+}
+
+lDesc <- lapply(lData, calcDesc)
+
+## Von list zu data.fram
+dDesc <- do.call("rbind", lDesc)
+
+head(dDesc)
+
+@ 
+
+\end{frame}
+
+
+
+
+
+
+\begin{frame}[allowframebreaks, fragile]
+  \frametitle{Schleifen vermeiden mit ddply}
+  
+<<cache = TRUE>>=
+## Anzahl Datensaetze
+n <- 100
+## data.frame-Objekt mit Parameterangaben und Dateinamen
+means <- sample(0:20, n, replace = TRUE)
+sd <- sample(1:10, n, replace = TRUE)
+param <- data.frame(m = means, sd)
+param$filename <- paste0("../../data/n_files/dat", 
+                         1:n, ".dat")
+head(param, n = 2)
+
+@ 
+
+<<>>=
+
+## Funktion zum erzeugen der Datensaetze & abspeichern
+genData <- function(x){
+    mySample <- rnorm(n, x$m, x$sd)
+    write.table(mySample, file = x$filename, 
+                row.names = FALSE, col.names = FALSE)
+}
+
+@ 
+
+<<cache = TRUE>>=
+## Die "eigentliche Schleife"
+invisible(ddply(param, .(1:n), genData))
+## invisible() unterdrueckt die Ausgabe...
+
+@ 
+
+<<>>=
+## Jetzt die n Datenfiles wieder einlesen 
+readData <- function(x){
+    dat <- read.table(file = x$filename)
+    return(dat)
+}
+
+@ 
+
+<<>>=
+
+## Die "eigentliche Schleife" zum Einlesen
+lData <- dlply(param, .(1:n), readData)
+
+@ 
+
+
+<<>>=
+## Einen data.frame mit deskr. Statistiken
+## erstellen
+
+calcDesc <- function(x){
+    m <- mean(x$V1)
+    sd <- sd(x$V1)
+    minimum <- min(x$V1)
+    maximum <- max(x$V1)
+    return(data.frame(m, sd, minimum, maximum))
+}
+
+## Von list zu data.fram
+dDesc1 <- ldply(lData, calcDesc)
+head(dDesc1)
+
+@ 
+
+\end{frame}
+
+
+
+\section{Weitere Quellen und Literatur}
+
+
+\begin{frame}[allowframebreaks]
+  \frametitle{Hilfreiche Quelle}
+  \begin{itemize}
+  \item Markus Gesmann hat sich sich bereits zu diesem Thema ausgelassen:
+    "`Say it in R with \enquote{by}, \enquote{apply} and friends"'
+    \citep{gesmann_say_2013}.
+  \item Unbedingt Hadley Wickhams JSS-Artikel lesen
+    \citep{wickham_split-apply-combine_2011} bzw. die Website dazu besuchen:
+    \url{http://plyr.had.co.nz/}.
+  \item Eine schöne Darstellung aller \code{*pply}-Varianten findet sich hier: \href{http://nsaunders.wordpress.com/2010/08/20/a-brief-introduction-to-apply-in-r/}{A brief introduction to “apply” in R}
+  \item Stata vs R in
+    \href{http://rforpublichealth.blogspot.de/2013/10/loops-revisited-how-to-rethink-macros.html}{Loops
+      revisited: How to rethink macros when using R}
+  \item Eine schöne Übersicht zu \href{http://www.cookbook-r.com/Manipulating_data/Summarizing_data/}{Summarizing data}
+  \item Auch auf CrossValidated wurde gefragt:
+    \href{http://stats.stackexchange.com/questions/8225/how-to-summarize-data-by-group-in-r}{How
+      to summarize data by group in R?}
+  \item \ldots und auf Stackoverflow:
+    \href{http://stackoverflow.com/questions/3505701/r-grouping-functions-sapply-vs-lapply-vs-apply-vs-tapply-vs-by-vs-aggrega/}{R
+      Grouping functions: sapply vs. lapply vs. apply. vs. tapply vs. by
+      vs. aggregate vs}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{Literatur}
+  \printbibliography
+\end{frame}
+
+
+
+\end{document}

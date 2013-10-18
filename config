@@ -1,0 +1,12 @@
+# -*- yaml -*-
+
+## Define directories
+## NO closing slash!
+dir:
+  wd : "E:/projects/confer/ps2013-10-krug-apply_co"
+  data : "E:/projects/confer/ps2013-10-krug-apply_co/data"
+  gfx : "/graph"
+## Version
+
+## Define computer name -- this is done automatically by run_waf.py
+computername : WEISS-NOTEBOOK
