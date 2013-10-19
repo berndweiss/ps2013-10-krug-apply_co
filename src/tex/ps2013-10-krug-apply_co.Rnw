@@ -1,11 +1,3 @@
-%% http://user.uni-frankfurt.de/~muehlich/tex/wordvslatex.html
-% Local variables:
-% TeX-open-quote: "\"`"
-% TeX-close-quote: "\"'"
-% End:
-
-%% Um in Bibliographie dt. Titel von \MakeSentenceCase zu schuetzen, doppelte {{}} verwenden.
-
 \documentclass[%
 handout, %
 ]{beamer}
@@ -24,11 +16,7 @@ handout, %
 \setbeamertemplate{caption}[numbered]
 %\usecolortheme{beaver}
 
-%%\usecolortheme{rose}%seagull} 
 \usecolortheme{dolphin}
-%\useoutertheme{infolines}
-%\useinnertheme{circles}
-%\setbeamertemplate{itemize item}[circle]
 \setbeamertemplate{itemize items}[square]
 
 \usepackage{color}
@@ -47,9 +35,6 @@ handout, %
 \usepackage{amsmath}
 
 \usepackage{listings}
-% \lstset{language =[LaTeX]TeX, numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=5pt,%%
-% keywordstyle=\color{red}\bfseries,showstringspaces=true}
-%% \lstset{}
 
 \usepackage{tikz}
 \usetikzlibrary{calc, arrows,shapes,positioning,shadows,trees, decorations.text,mindmap,automata}

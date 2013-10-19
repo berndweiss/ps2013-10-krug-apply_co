@@ -18,7 +18,7 @@ def build(bld):
     def run_knitr(task):
 	    ## .replace('\\', '/') as suggested by T Nagy in ...
         src = task.inputs[0].abspath().replace('\\', '/') 
-        cmd = 'R -e "library(knitr); print(getwd()); knit(\'%s\')"' % (src)
+        cmd = 'R -e "library(knitr); print(getwd()); knit(\'%s\'); purl(\'%s\')"' % (src, src)
         return task.exec_command(cmd) 
 
     bld(rule = run_knitr,
