@@ -236,10 +236,10 @@ options(width=60)
   Alle nachfolgend aufgeführten Pakete und Befehle können nach folgenden
   Dimensionen/Aspekten gegliedert werden:
   \begin{itemize}
-  \item Statistische Aggregation ($Dim_{input} > Dim_{output}$) vs
-    Datentaufbereitung/-transformation ($Dim_{input} = Dim_{output}$)
-  \item Ausgangsdatentyp (z.B. \code{data.frame}) vs Zieldatentyp (z.B. \code{vector})
-  \item (Vektorisierte) Alternative zu Schleifen vs Aggregation/Transformation
+  \item Statistische Aggregation ($Dim_{input} > Dim_{output}$)
+  \item Datentaufbereitung/-transformation ($Dim_{input} = Dim_{output}$)
+  \item Alternative zu Schleifen ($Dim_{input} > Dim_{output}$, $Dim_{input} =
+    Dim_{output}$, $Dim_{input} < Dim_{output}$)
   \end{itemize}
 \end{frame}
 
@@ -247,29 +247,29 @@ options(width=60)
 \begin{frame}
   \frametitle{Eine (unvollständige) Übersicht von Paketen und Befehlen}
   %% 
-  \begin{small}
+  \begin{footnotesize}
     \begin{itemize}
     \item \code{base}-Paket:
       \begin{itemize}
       \item \code{apply}, \code{lapply} (\code{sapply}), \code{tapply},
-        \code{mapply}, \ldots
+        \code{mapply}, \code{vapply}, \code{rapply}, \ldots
       \item \code{by}, \code{aggregate}
+      \item \code{ave}
       \item \code{replicate}
-      \item \ldots
       \end{itemize}
     \item \code{plyr}-Paket (u.a. konsistentes Namensschema für Ein- und
       Ausgabedatentyp, parallele Verarbeitung)
+    \item \code{reshape2}
     \item \code{doBy}-Paket (orientiert sich an SAS-Funktion, stat. Aggregation)
     \item \code{data.table}-Paket (meistens schnellste\footnote[frame]{Für einen
         Geschwindigkeitstest siehe
         \href{http://www.r-statistics.com/2013/09/a-speed-test-comparison-of-plyr-data-table-and-dplyr/}{A
           speed test comparison of plyr, data.table, and dplyr}, abgerufen am
-        2.10.2013} Lösung, aber eigenwillige Syntax)
-    \item \ldots
+        2.10.2013} Lösung, eigenwillige Syntax)
     \end{itemize}
     \citet[Für eine umfassendere Darstellung siehe
     u.a.][]{wickham_split-apply-combine_2011}.
-  \end{small}
+  \end{footnotesize}
 \end{frame}
 
 
@@ -409,6 +409,42 @@ tapply(dat$x, INDEX = list(dat$g1, dat$g2), mean)
 @ 
 
 \end{frame}
+
+
+\begin{frame}[allowframebreaks, fragile]
+  \frametitle{ave()} 
+
+  \begin{block}{Problem}
+    Eine Funktion (mean, sd, etc.) auf Subgruppen eines Datensatzes anwenden und
+    Aggregatstatistiken berechnen.
+  \end{block}
+
+  
+<<>>=
+## Datensatz erstellen
+dat <- data.frame(g1 = c(1, 1, 2, 2, 3, 3),
+                  ## M_1 = 2, M_2 = 1
+                  x = c(10, 21, 3, 0.5, 1, 1.5))
+dat
+@   
+
+Im Gegensatz zu etwa \code{tapply} oder \code{aggregate}, die eine Tabelle oder
+ein aggregiertes (lies: reduziertes) Objekt zurückgeben, hat \code{ave} den
+Vorteil, dass das zurückgegebene Objekt die gleiche Anzahl Zeilen wie das
+Ausgangsobjekt besitzt. Wenn man bspw. die nach Gruppen berechneten Mittelwerte
+wieder dem Ausgangsdatensatz zuspielen, entfällt damit der \code{merge}-Zwischenschritt. 
+
+<<>>=
+
+## Gruppenmittelwerte berechnen
+ave(dat[, "x"], dat$g1, FUN = mean)
+
+
+@ 
+
+\end{frame}
+
+
 
 
 \subsection{Das \code{plyr}-Paket}
